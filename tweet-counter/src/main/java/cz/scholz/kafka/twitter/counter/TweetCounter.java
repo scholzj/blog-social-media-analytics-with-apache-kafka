@@ -20,19 +20,22 @@ import java.util.Properties;
 
 public class TweetCounter {
     public static void main(final String[] args) throws Exception {
+        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "info");
+        System.setProperty("org.slf4j.simpleLogger.showThreadName", "false");
+
         Properties props = new Properties();
-        props.put(StreamsConfig.APPLICATION_ID_CONFIG, "tweet-counter");
-        props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "172.30.97.29:9092");
+        props.put(StreamsConfig.APPLICATION_ID_CONFIG, "twitter-counter");
+        props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "172.30.53.23:9092");
         props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
 
         StreamsBuilder builder = new StreamsBuilder();
-        KStream<String, String> tweets = builder.stream("twitterFeed");
-        KTable<String, Long> counts = tweets.groupByKey().count(Materialized.<String, Long, KeyValueStore<Bytes, byte[]>>as("tweet-counts-store"));
-        counts.toStream().to("tweet-counts", Produced.with(Serdes.String(), Serdes.Long()));
+        KStream<String, String> tweets = builder.stream("twitter-feed");
+
+        KTable<String, Long> counts = tweets.groupBy((key, value) -> key).count();
+        counts.toStream().to("twitter-counter", Produced.with(Serdes.String(), Serdes.Long()));
 
         KafkaStreams streams = new KafkaStreams(builder.build(), props);
         streams.start();
     }
-
 }

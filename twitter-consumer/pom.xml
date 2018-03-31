@@ -10,12 +10,12 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>tweet-counter</artifactId>
+    <artifactId>twitter-consumer</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka-streams</artifactId>
+            <artifactId>kafka-clients</artifactId>
             <version>1.0.1</version>
         </dependency>
         <dependency>
